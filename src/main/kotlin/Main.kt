@@ -12,18 +12,15 @@ const val MINIMUM_AMOUNT_TO_CHARGE_TAX = 20000.0
 
 
 fun called(json: String): List<Tax> {
-    val array = Json.decodeFromString<Array<CorporateStock>>(json)
+    val array = Json.decodeFromString<Array<Stock>>(json)
     val main = Main()
-
-    return array.map { acao ->
-        main.juntarTodo(acao)
-    }
+    return array.map {main.invoked(it)}
 }
 
 @Serializable
-data class CorporateStock(val operation: String,
-                          val quantity: Int,
-                          @JsonNames("unit-cost")
+data class Stock(val operation: String,
+                 val quantity: Int,
+                 @JsonNames("unit-cost")
                 val unitCost: Double)
 
 data class Tax(val tax: Double)
@@ -34,28 +31,27 @@ class Main {
     private var currentQuantityCorporateStock = 0
 
     private var tax = mutableListOf<Tax>()
-    fun juntarTodo(corporateStock: CorporateStock): Tax {
-        when(corporateStock.operation) {
+    fun invoked(stock: Stock): Tax {
+        when(stock.operation) {
             "buy" -> {
-                currentWeightedAveragePrice = weightedAveragePrice(corporateStock.quantity, corporateStock.unitCost)
-                currentQuantityCorporateStock += corporateStock.quantity
+                setWeightedAveragePrice(weightedAveragePrice(stock.quantity, stock.unitCost))
+                setCurrentQuantityCorporateStock(stock.quantity)
                 tax.add(Tax(TAX_ZERO))
                 return Tax(TAX_ZERO)
             }
             "sell" -> {
-                subStocksQuantity(corporateStock.quantity)
-                return if (currentWeightedAveragePrice >= corporateStock.unitCost) {
-                    sumDamageAboutSell(corporateStock.unitCost, corporateStock.quantity)
+                subStocksQuantity(stock.quantity)
+                return if (isPriceStockLessThanAveragePrice(stock.unitCost)) {
+                    sumDamageAboutSell(stock.unitCost, stock.quantity)
                     tax.add(Tax(TAX_ZERO))
                     Tax(TAX_ZERO)
                 } else {
-                    val valorTotal = valorTotalDaOperacaoDeduzidoOPreju(corporateStock.unitCost, corporateStock.quantity)
-                    if (valorTotal <= MINIMUM_AMOUNT_TO_CHARGE_TAX) {
-                        subDamage(kotlin.math.abs((getCurrentWeightedAveragePrice().minus(corporateStock.unitCost) * corporateStock.quantity)))
+                    if (totalValueIsLessThanMinimumAmountToChargeTax(stock.unitCost, stock.quantity)) {
+                        calculationReduceDamage(stock.unitCost, stock.quantity)
                         tax.add(Tax(TAX_ZERO))
                         Tax(TAX_ZERO)
                     } else {
-                        val profit = calculateProfit(corporateStock.unitCost, corporateStock.quantity) * TAX_PERCENTAGE
+                        val profit = calculateProfit(stock.unitCost, stock.quantity)
                         tax.add(Tax(profit))
                         Tax(profit)
                     }
@@ -68,8 +64,24 @@ class Main {
         }
     }
 
+    private fun totalValueIsLessThanMinimumAmountToChargeTax(value: Double, quantity: Int): Boolean {
+        return valorTotalDaOperacaoDeduzidoOPreju(value, quantity) <= MINIMUM_AMOUNT_TO_CHARGE_TAX
+    }
+
+    private fun isPriceStockLessThanAveragePrice(value: Double): Boolean {
+        return value <= getCurrentWeightedAveragePrice()
+    }
+
+    private fun calculationReduceDamage(value: Double, quantity: Int) {
+        subDamage(kotlin.math.abs((getCurrentWeightedAveragePrice().minus(value) * quantity)))
+    }
+
     fun getCurrentWeightedAveragePrice(): Double {
         return currentWeightedAveragePrice
+    }
+
+    private fun setWeightedAveragePrice(value: Double) {
+        currentWeightedAveragePrice = value
     }
 
     fun getDamage(): Double {
@@ -80,17 +92,12 @@ class Main {
         return currentQuantityCorporateStock
     }
 
+    private fun setCurrentQuantityCorporateStock(quantity: Int) {
+        currentQuantityCorporateStock += quantity
+    }
+
     private fun subStocksQuantity(quantity: Int) {
         currentQuantityCorporateStock -= quantity
-    }
-
-    fun weightedAveragePrice(quantityStocksBuy: Int, value: Double): Double {
-        return ((getCurrentQuantityCorporateStock() * getCurrentWeightedAveragePrice()) + (quantityStocksBuy * value)) /
-                (getCurrentQuantityCorporateStock() + quantityStocksBuy)
-    }
-
-    fun sumDamageAboutSell(value: Double, quantity: Int): Double {
-        return sumDamage(kotlin.math.abs(getCurrentWeightedAveragePrice().minus(value) * quantity))
     }
 
     private fun sumDamage(value: Double): Double {
@@ -102,8 +109,19 @@ class Main {
         currentDamage = kotlin.math.abs(currentDamage.minus(value))
     }
 
+    fun weightedAveragePrice(quantityStocksBuy: Int, value: Double): Double {
+        return ((getCurrentQuantityCorporateStock() * getCurrentWeightedAveragePrice()) + (quantityStocksBuy * value)) /
+                (getCurrentQuantityCorporateStock() + quantityStocksBuy)
+    }
+
+    fun sumDamageAboutSell(value: Double, quantity: Int): Double {
+        return sumDamage(kotlin.math.abs(getCurrentWeightedAveragePrice().minus(value) * quantity))
+    }
+
+
+
     fun calculateProfit(stockValue: Double, quantity: Int): Double {
-       return (stockValue.minus(getCurrentWeightedAveragePrice()) * quantity).minus(getDamage())
+       return (stockValue.minus(getCurrentWeightedAveragePrice()) * quantity).minus(getDamage()) * TAX_PERCENTAGE
     }
 
     fun calcularDiferencaPrejuizo(valorTotal: Double): Double {

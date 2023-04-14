@@ -38,7 +38,7 @@ class MainTest {
 
     @Test
     fun calcularLucro() {
-        val expected = 90.0
+        val expected = 18.0
         val main = Main()
         val calcularLucro = main.calculateProfit(30.0, 3)
         assertEquals(expected, calcularLucro)
@@ -77,7 +77,7 @@ class MainTest {
     @Test
     fun testJuntarTudoQuandoCompra() {
         val main = Main()
-        val juntar = main.juntarTodo(CorporateStock("buy", 5, 20.0))
+        val juntar = main.invoked(Stock("buy", 5, 20.0))
 
         assertEquals(0.0, juntar.tax)
         assertEquals(20.0, main.getCurrentWeightedAveragePrice())
@@ -87,8 +87,8 @@ class MainTest {
     fun testJuntarTudoQuandoVenda() {
         val expectedPrejuizo = 25.0
         val main = Main()
-        main.juntarTodo(CorporateStock("buy", 5, 20.0))
-        val juntar = main.juntarTodo(CorporateStock("sell", 5, 15.0))
+        main.invoked(Stock("buy", 5, 20.0))
+        val juntar = main.invoked(Stock("sell", 5, 15.0))
 
         assertEquals(0.0, juntar.tax)
         assertEquals(main.getDamage(), expectedPrejuizo)
@@ -98,8 +98,8 @@ class MainTest {
     fun testJuntarTudoQuandoVenda2() {
         val expected = 8400.0
         val main = Main()
-        main.juntarTodo(CorporateStock("buy", 200, 20.0))
-        val juntar = main.juntarTodo(CorporateStock("sell", 150, 300.0))
+        main.invoked(Stock("buy", 200, 20.0))
+        val juntar = main.invoked(Stock("sell", 150, 300.0))
 
         assertEquals(expected, juntar.tax)
     }
@@ -108,11 +108,11 @@ class MainTest {
     fun testQuandoDaErroNoTipo6() {
         val main = Main()
 
-        main.juntarTodo(CorporateStock("buy", 10000, 10.0))
-        main.juntarTodo(CorporateStock("sell", 5000, 2.0))
+        main.invoked(Stock("buy", 10000, 10.0))
+        main.invoked(Stock("sell", 5000, 2.0))
         assertEquals(40000.0, main.getDamage())
 
-        main.juntarTodo(CorporateStock("sell", 2000, 20.0))
+        main.invoked(Stock("sell", 2000, 20.0))
         assertEquals(20000.0, main.getDamage())
     }
 
