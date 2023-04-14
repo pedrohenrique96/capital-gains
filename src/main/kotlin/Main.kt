@@ -149,8 +149,9 @@ class Main {
         return prejuizoMaluco
     }
 
-    private fun subPrejuizo(valor: Double) {
-        prejuizoMaluco = kotlin.math.abs(getPrejuizoMaluco().minus(valor))
+    private fun subPrejuizo(valor: Double): Double {
+        prejuizoMaluco -= valor
+        return prejuizoMaluco
     }
 
     fun calcularLucro(valorDaAcao: Double, quantidade: Int): Double {
@@ -162,12 +163,14 @@ class Main {
     fun valorTotalDaOperacaoDeduzidoOPreju(custoUnitárioDaAção: Double, quantidade: Int): Double {
         val valorTotal = custoUnitárioDaAção * quantidade
 
+
         if (valorTotal <= getPrejuizoMaluco()) {
-            subPrejuizo(valorTotal)
+            val deduzir = getPrecoMedioPonderado().minus(custoUnitárioDaAção) * quantidade
+            subPrejuizo(deduzir)
             return 0.0
         } else if (getPrejuizoMaluco() > 0) {
-            subPrejuizo(getPrejuizoMaluco())
-            return calcularDiferencaPrejuizo(valorTotal)
+            val deduzir = getPrecoMedioPonderado().minus(custoUnitárioDaAção) * quantidade
+            subPrejuizo(deduzir)
         }
 
         return calcularDiferencaPrejuizo(valorTotal)

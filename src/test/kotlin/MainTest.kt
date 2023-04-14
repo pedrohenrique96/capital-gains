@@ -104,6 +104,19 @@ class MainTest {
         assertEquals(expected, juntar.valor)
     }
 
+    @Test
+    fun testQuandoDaErroNoTipo6() {
+        val expected = 0.0
+        val main = Main()
+
+        main.juntarTodo(Acao("buy", 10000, 10.0))
+        main.juntarTodo(Acao("sell", 5000, 2.0))
+//        assertEquals(40000.0, main.getPrejuizoMaluco())
+
+        main.juntarTodo(Acao("sell", 2000, 20.0))
+        assertEquals(20000.0, main.getPrejuizoMaluco())
+    }
+
 
     @Test
     fun testarOInputDoJsonCaso1() {

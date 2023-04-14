@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="MainTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2023-04-14T14:46:58" hostname="CRED-C02ZG54BLVDQ" time="0.112">
+<testsuite name="MainTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2023-04-14T15:27:09" hostname="CRED-C02ZG54BLVDQ" time="0.028">
   <properties/>
-  <testcase name="testarOInputDoJsonCaso6()" classname="MainTest" time="0.112">
-    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;[Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=3000.0)]&gt; but was: &lt;[Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=4000.0), Taxa(valor=3000.0)]&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;[Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=3000.0)]&gt; but was: &lt;[Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=0.0), Taxa(valor=4000.0), Taxa(valor=3000.0)]&gt;
+  <testcase name="testQuandoDaErroNoTipo6()" classname="MainTest" time="0.028">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;20000.0&gt; but was: &lt;60000.0&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;20000.0&gt; but was: &lt;60000.0&gt;
 	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
 	at org.junit.jupiter.api.AssertionUtils.failNotEqual(AssertionUtils.java:62)
 	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
@@ -12,7 +12,7 @@
 	at kotlin.test.AssertionsKt.assertEquals(Unknown Source)
 	at kotlin.test.AssertionsKt__AssertionsKt.assertEquals$default(Assertions.kt:62)
 	at kotlin.test.AssertionsKt.assertEquals$default(Unknown Source)
-	at MainTest.testarOInputDoJsonCaso6(MainTest.kt:200)
+	at MainTest.testQuandoDaErroNoTipo6(MainTest.kt:117)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
