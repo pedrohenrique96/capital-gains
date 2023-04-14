@@ -77,20 +77,20 @@ class MainTest {
     @Test
     fun testJuntarTudoQuandoCompra() {
         val main = Main()
-        val juntar = main.juntarTodo(Acao("buy", 5, 20.0))
+        val juntar = main.juntarTodo(CorporateStock("buy", 5, 20.0))
 
-        assertEquals(0.0, juntar.valor)
-        assertEquals(20.0, main.getPrecoMedioPonderado())
+        assertEquals(0.0, juntar.tax)
+        assertEquals(20.0, main.getCurrentWeightedAveragePrice())
     }
 
     @Test
     fun testJuntarTudoQuandoVenda() {
         val expectedPrejuizo = 25.0
         val main = Main()
-        main.juntarTodo(Acao("buy", 5, 20.0))
-        val juntar = main.juntarTodo(Acao("sell", 5, 15.0))
+        main.juntarTodo(CorporateStock("buy", 5, 20.0))
+        val juntar = main.juntarTodo(CorporateStock("sell", 5, 15.0))
 
-        assertEquals(0.0, juntar.valor)
+        assertEquals(0.0, juntar.tax)
         assertEquals(main.getPrejuizoMaluco(), expectedPrejuizo)
     }
 
@@ -98,28 +98,28 @@ class MainTest {
     fun testJuntarTudoQuandoVenda2() {
         val expected = 8400.0
         val main = Main()
-        main.juntarTodo(Acao("buy", 200, 20.0))
-        val juntar = main.juntarTodo(Acao("sell", 150, 300.0))
+        main.juntarTodo(CorporateStock("buy", 200, 20.0))
+        val juntar = main.juntarTodo(CorporateStock("sell", 150, 300.0))
 
-        assertEquals(expected, juntar.valor)
+        assertEquals(expected, juntar.tax)
     }
 
     @Test
     fun testQuandoDaErroNoTipo6() {
         val main = Main()
 
-        main.juntarTodo(Acao("buy", 10000, 10.0))
-        main.juntarTodo(Acao("sell", 5000, 2.0))
+        main.juntarTodo(CorporateStock("buy", 10000, 10.0))
+        main.juntarTodo(CorporateStock("sell", 5000, 2.0))
         assertEquals(40000.0, main.getPrejuizoMaluco())
 
-        main.juntarTodo(Acao("sell", 2000, 20.0))
+        main.juntarTodo(CorporateStock("sell", 2000, 20.0))
         assertEquals(20000.0, main.getPrejuizoMaluco())
     }
 
 
     @Test
     fun testarOInputDoJsonCaso1() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0))
 
 
         val json = """
@@ -129,14 +129,14 @@ class MainTest {
             """.trimIndent()
 
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso2() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(10000.0), Taxa(0.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(10000.0), Tax(0.0))
 
         val json = """
             [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -144,14 +144,14 @@ class MainTest {
             {"operation":"sell", "unit-cost":5.00, "quantity": 5000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso3() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(1000.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(1000.0))
 
         val json = """
             [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -159,14 +159,14 @@ class MainTest {
             {"operation":"sell", "unit-cost":20.00, "quantity": 3000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso4() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0))
 
         val json = """
             [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -174,14 +174,14 @@ class MainTest {
             {"operation":"sell", "unit-cost":15.00, "quantity": 10000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso5() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0), Taxa(10000.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0), Tax(10000.0))
 
         val json = """
            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -190,14 +190,14 @@ class MainTest {
             {"operation":"sell", "unit-cost":25.00, "quantity": 5000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso6() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0), Taxa(0.0), Taxa(3000.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0), Tax(0.0), Tax(3000.0))
 
         val json = """
            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -207,15 +207,15 @@ class MainTest {
             {"operation":"sell", "unit-cost":25.00, "quantity": 1000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso7() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0),
-                Taxa(0.0), Taxa(3000.0), Taxa(0.0), Taxa(0.0), Taxa(3700.0), Taxa(0.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0),
+                Tax(0.0), Tax(3000.0), Tax(0.0), Tax(0.0), Tax(3700.0), Tax(0.0))
 
         val json = """
            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -229,14 +229,14 @@ class MainTest {
             {"operation":"sell", "unit-cost":30.00, "quantity": 650}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
 
     @Test
     fun testarOInputDoJsonCaso8() {
-        val expected = listOf<Taxa>(Taxa(0.0), Taxa(80000.0), Taxa(0.0), Taxa(60000.0))
+        val expected = listOf<Tax>(Tax(0.0), Tax(80000.0), Tax(0.0), Tax(60000.0))
 
         val json = """
            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
@@ -245,7 +245,7 @@ class MainTest {
             {"operation":"sell", "unit-cost":50.00, "quantity": 10000}]
             """.trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
         assertEquals(expected, test)
     }
@@ -253,8 +253,8 @@ class MainTest {
     @Test
     @Disabled
     fun testarOInputDoJsonCaso1Mais2() {
-        val expected1 = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0))
-        val expected2 = listOf<Taxa>(Taxa(0.0), Taxa(10000.0), Taxa(0.0))
+        val expected1 = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0))
+        val expected2 = listOf<Tax>(Tax(0.0), Tax(10000.0), Tax(0.0))
 
         val json = """
             [
@@ -268,7 +268,7 @@ class MainTest {
                 {"operation":"sell", "unit-cost":5.00, "quantity": 5000}
             ]""".trimIndent()
 
-        val test = testao(json)
+        val test = called(json)
 
 
         assertEquals(expected1, test)

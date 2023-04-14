@@ -2,75 +2,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
-//
-//var precoMedioPonderado = 0
-//var quantidadesDeacoesAtual = 0
-//var prejuizoMaluco = 0
-//
-//if operation == "buy":
-//precoMedioPonderado = calcularOPrecoMedioPonderado(5, 20)
-//return {tax: 0}
-//else if operation == sell:
-//if do preju (precoMedioPonderado >= valorDaAcaoDeVenda):
-//prejuizoMaluco = valorDoPrejuizoNessaVenda(valorDaAcaoDeVenda, quantidade)
-//return 0
-//
-//else if sem preju (precoMedioPonderado < valorDaAcaoDeVenda)
-//valorTotal = valorTotalDaOperacaoDeduzidoOPreju();
-//if valorTotal <= 20000
-//return {tax: 0}
-//else:
-//return {tax: (calcularLucro(valorTotal) * 0.20)}
-//
-//funcao calcularOPrecoMedioPonderado(quantidadeAcoesComprada, valorDaCompra) {
-//
-
-//}
-//
-//
-//// Essa funcao deve abater o prejuizo até que ele fica zerado
-//funcao valorDoPrejuizoNessaVenda(valorDaAcaoDeVenda, quantidade) {
-//    quantidadesDeacoesAtual = quantidadesDeacoesAtual -= quantidade
-//    return (valorDaAcaoDeVenda - precoMedioPonderado) * quantidade
-//}
-//
-//// verificar se combrara imposto e deduz prejuizo para novo valor
-//funcao valorTotalDaOperacaoDeduzidoOPreju(custoUnitárioDaAção, quantidade) {
-//    quantidadesDeacoesAtual = quantidadesDeacoesAtual -= quantidade
-//    var calculoTotal = custoUnitárioDaAção x quantidade
-//    calcularDiferencaEAtualizarPrejuizo ()
-//    return calculoTotal - prejuizoMaluco // Nunca negativo e pegar valor negativo e adicionar como prejuizo novo dado o exemploe retorna 0
-//
-//    ex: 100 - 150 = -50
-//    // Novo prejuizo 50
-//}
-//
-//funcao calcularDiferencaEAtualizarPrejuizo() {
-//    prejuizoMaluco = calculoTotal - prejuizoMaluco // Nunca Negativo pls
-//}
-//
-////difenca entre
-//calcularLucro(valorDaAcao, quantidade) {
-//    var valor = (valorDaAcao - precoMedioPonderado) // pegar a diferenca
-//
-//    var lucro = valor * quantidade
-//
-//    return lucro
-//}
-
-
-
 fun main(args: Array<String>) {
     println("Hello World!")
-
-    val main = Main()
-
-
 }
 
-fun testao(json: String): List<Taxa> {
+const val TAX_PERCENTAGE = 0.20
+const val TAX_ZERO = 0.0
+const val MINIMUM_AMOUNT_TO_CHARGE_TAX = 20000.0
 
-    val array = Json.decodeFromString<Array<Acao>>(json)
+
+fun called(json: String): List<Tax> {
+    val array = Json.decodeFromString<Array<CorporateStock>>(json)
     val main = Main()
 
     return array.map { acao ->
@@ -79,70 +21,76 @@ fun testao(json: String): List<Taxa> {
 }
 
 @Serializable
-data class Acao(val operation: String,
-                val quantity: Int,
-                @JsonNames("unit-cost")
+data class CorporateStock(val operation: String,
+                          val quantity: Int,
+                          @JsonNames("unit-cost")
                 val unitCost: Double)
 
-data class Taxa(val valor: Double)
+data class Tax(val tax: Double)
 
 class Main {
-    private var precoMedioPonderado = 0.0
-    private var prejuizoMaluco = 0.0
-    private var quantidadesDeacoesAtual = 0
+    private var currentWeightedAveragePrice = 0.0
+    private var damage = 0.0
+    private var currentQuantityCorporateStock = 0
 
-    private var taxa = mutableListOf<Taxa>()
-    fun juntarTodo(acao: Acao): Taxa {
-        if (acao.operation == "buy") {
-            precoMedioPonderado = weightedAveragePrice(acao.quantity, acao.unitCost)
-            quantidadesDeacoesAtual += acao.quantity
-            taxa.add(Taxa(0.0))
-            return Taxa(0.0)
-        } else if (acao.operation == "sell") {
-            subQuantidadeDeAcoes(acao.quantity)
-            return if (precoMedioPonderado >= acao.unitCost) {
-                valorDoPrejuizoDeVenda(acao.unitCost, acao.quantity)
-                taxa.add(Taxa(0.0))
-                Taxa(0.0)
-            } else {
-                val valorTotal = valorTotalDaOperacaoDeduzidoOPreju(acao.unitCost, acao.quantity)
-                if (valorTotal <= 20000) {
-                    val deduzir = kotlin.math.abs((getPrecoMedioPonderado().minus(acao.unitCost) * acao.quantity))
-                    subPrejuizo(deduzir)
-                    taxa.add(Taxa(0.0))
-                    Taxa(0.0)
+    private var tax = mutableListOf<Tax>()
+    fun juntarTodo(corporateStock: CorporateStock): Tax {
+        when(corporateStock.operation) {
+            "buy" -> {
+                currentWeightedAveragePrice = weightedAveragePrice(corporateStock.quantity, corporateStock.unitCost)
+                currentQuantityCorporateStock += corporateStock.quantity
+                tax.add(Tax(TAX_ZERO))
+                return Tax(TAX_ZERO)
+            }
+            "sell" -> {
+                subQuantidadeDeAcoes(corporateStock.quantity)
+                return if (currentWeightedAveragePrice >= corporateStock.unitCost) {
+                    valorDoPrejuizoDeVenda(corporateStock.unitCost, corporateStock.quantity)
+                    tax.add(Tax(TAX_ZERO))
+                    Tax(TAX_ZERO)
                 } else {
-                    val calcular = calcularLucro(acao.unitCost, acao.quantity) * 0.20
-                    taxa.add(Taxa(calcular))
-                    Taxa(calcular)
+                    val valorTotal = valorTotalDaOperacaoDeduzidoOPreju(corporateStock.unitCost, corporateStock.quantity)
+                    if (valorTotal <= MINIMUM_AMOUNT_TO_CHARGE_TAX) {
+                        val deduzir = kotlin.math.abs((this.getCurrentWeightedAveragePrice().minus(corporateStock.unitCost) * corporateStock.quantity))
+                        subPrejuizo(deduzir)
+                        tax.add(Tax(TAX_ZERO))
+                        Tax(TAX_ZERO)
+                    } else {
+                        val calcular = calcularLucro(corporateStock.unitCost, corporateStock.quantity) * TAX_PERCENTAGE
+                        tax.add(Tax(calcular))
+                        Tax(calcular)
+                    }
                 }
             }
+            else -> {
+                tax.add(Tax(TAX_ZERO))
+                return Tax(TAX_ZERO)
+            }
         }
-        return Taxa(0.0)
     }
 
-    fun getPrecoMedioPonderado(): Double {
-        return precoMedioPonderado
+    fun getCurrentWeightedAveragePrice(): Double {
+        return currentWeightedAveragePrice
     }
 
     fun getPrejuizoMaluco(): Double {
-        return prejuizoMaluco
+        return damage
     }
 
-    fun getQuantidadesDeacoesAtual(): Int {
-        return quantidadesDeacoesAtual
+    fun getCurrentQuantityCorporateStock(): Int {
+        return currentQuantityCorporateStock
     }
 
     fun subQuantidadeDeAcoes(quantidade: Int) {
-        quantidadesDeacoesAtual -= quantidade
+        currentQuantityCorporateStock -= quantidade
     }
     fun weightedAveragePrice(quantidadeAcoesComprada: Int, valorDaCompra: Double): Double {
-        return ((getQuantidadesDeacoesAtual() * getPrecoMedioPonderado()) + (quantidadeAcoesComprada * valorDaCompra)) /
-                (getQuantidadesDeacoesAtual() + quantidadeAcoesComprada)
+        return ((this.getCurrentQuantityCorporateStock() * this.getCurrentWeightedAveragePrice()) + (quantidadeAcoesComprada * valorDaCompra)) /
+                (this.getCurrentQuantityCorporateStock() + quantidadeAcoesComprada)
     }
 
     fun valorDoPrejuizoDeVenda(valorDaAcaoDeVenda: Double, quantidade: Int): Double {
-        return sumPrejuizo(kotlin.math.abs(getPrecoMedioPonderado().minus(valorDaAcaoDeVenda) * quantidade))
+        return sumPrejuizo(kotlin.math.abs(getCurrentWeightedAveragePrice().minus(valorDaAcaoDeVenda) * quantidade))
     }
 
     fun calcularDiferencaPrejuizo(valorTotal: Double): Double {
@@ -150,16 +98,16 @@ class Main {
     }
 
     private fun sumPrejuizo(valor: Double): Double {
-        prejuizoMaluco += valor
-        return prejuizoMaluco
+        damage += valor
+        return damage
     }
 
     private fun subPrejuizo(valor: Double) {
-        prejuizoMaluco = kotlin.math.abs(prejuizoMaluco.minus(valor))
+        damage = kotlin.math.abs(damage.minus(valor))
     }
 
     fun calcularLucro(valorDaAcao: Double, quantidade: Int): Double {
-        val lucro =  valorDaAcao.minus(getPrecoMedioPonderado()) * quantidade
+        val lucro =  valorDaAcao.minus(this.getCurrentWeightedAveragePrice()) * quantidade
         return lucro.minus(getPrejuizoMaluco())
 
     }
