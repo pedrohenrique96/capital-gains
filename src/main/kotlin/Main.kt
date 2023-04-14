@@ -30,7 +30,7 @@ data class Tax(val tax: Double)
 
 class Main {
     private var currentWeightedAveragePrice = 0.0
-    private var damage = 0.0
+    private var currentDamage = 0.0
     private var currentQuantityCorporateStock = 0
 
     private var tax = mutableListOf<Tax>()
@@ -43,22 +43,21 @@ class Main {
                 return Tax(TAX_ZERO)
             }
             "sell" -> {
-                subQuantidadeDeAcoes(corporateStock.quantity)
+                subStocksQuantity(corporateStock.quantity)
                 return if (currentWeightedAveragePrice >= corporateStock.unitCost) {
-                    valorDoPrejuizoDeVenda(corporateStock.unitCost, corporateStock.quantity)
+                    sumDamageAboutSell(corporateStock.unitCost, corporateStock.quantity)
                     tax.add(Tax(TAX_ZERO))
                     Tax(TAX_ZERO)
                 } else {
                     val valorTotal = valorTotalDaOperacaoDeduzidoOPreju(corporateStock.unitCost, corporateStock.quantity)
                     if (valorTotal <= MINIMUM_AMOUNT_TO_CHARGE_TAX) {
-                        val deduzir = kotlin.math.abs((this.getCurrentWeightedAveragePrice().minus(corporateStock.unitCost) * corporateStock.quantity))
-                        subPrejuizo(deduzir)
+                        subDamage(kotlin.math.abs((getCurrentWeightedAveragePrice().minus(corporateStock.unitCost) * corporateStock.quantity)))
                         tax.add(Tax(TAX_ZERO))
                         Tax(TAX_ZERO)
                     } else {
-                        val calcular = calcularLucro(corporateStock.unitCost, corporateStock.quantity) * TAX_PERCENTAGE
-                        tax.add(Tax(calcular))
-                        Tax(calcular)
+                        val profit = calculateProfit(corporateStock.unitCost, corporateStock.quantity) * TAX_PERCENTAGE
+                        tax.add(Tax(profit))
+                        Tax(profit)
                     }
                 }
             }
@@ -73,49 +72,48 @@ class Main {
         return currentWeightedAveragePrice
     }
 
-    fun getPrejuizoMaluco(): Double {
-        return damage
+    fun getDamage(): Double {
+        return currentDamage
     }
 
-    fun getCurrentQuantityCorporateStock(): Int {
+    private fun getCurrentQuantityCorporateStock(): Int {
         return currentQuantityCorporateStock
     }
 
-    fun subQuantidadeDeAcoes(quantidade: Int) {
-        currentQuantityCorporateStock -= quantidade
-    }
-    fun weightedAveragePrice(quantidadeAcoesComprada: Int, valorDaCompra: Double): Double {
-        return ((this.getCurrentQuantityCorporateStock() * this.getCurrentWeightedAveragePrice()) + (quantidadeAcoesComprada * valorDaCompra)) /
-                (this.getCurrentQuantityCorporateStock() + quantidadeAcoesComprada)
+    private fun subStocksQuantity(quantity: Int) {
+        currentQuantityCorporateStock -= quantity
     }
 
-    fun valorDoPrejuizoDeVenda(valorDaAcaoDeVenda: Double, quantidade: Int): Double {
-        return sumPrejuizo(kotlin.math.abs(getCurrentWeightedAveragePrice().minus(valorDaAcaoDeVenda) * quantidade))
+    fun weightedAveragePrice(quantityStocksBuy: Int, value: Double): Double {
+        return ((getCurrentQuantityCorporateStock() * getCurrentWeightedAveragePrice()) + (quantityStocksBuy * value)) /
+                (getCurrentQuantityCorporateStock() + quantityStocksBuy)
+    }
+
+    fun sumDamageAboutSell(value: Double, quantity: Int): Double {
+        return sumDamage(kotlin.math.abs(getCurrentWeightedAveragePrice().minus(value) * quantity))
+    }
+
+    private fun sumDamage(value: Double): Double {
+        currentDamage += value
+        return currentDamage
+    }
+
+    private fun subDamage(value: Double) {
+        currentDamage = kotlin.math.abs(currentDamage.minus(value))
+    }
+
+    fun calculateProfit(stockValue: Double, quantity: Int): Double {
+       return (stockValue.minus(getCurrentWeightedAveragePrice()) * quantity).minus(getDamage())
     }
 
     fun calcularDiferencaPrejuizo(valorTotal: Double): Double {
-        return kotlin.math.abs(valorTotal.minus(getPrejuizoMaluco()))
-    }
-
-    private fun sumPrejuizo(valor: Double): Double {
-        damage += valor
-        return damage
-    }
-
-    private fun subPrejuizo(valor: Double) {
-        damage = kotlin.math.abs(damage.minus(valor))
-    }
-
-    fun calcularLucro(valorDaAcao: Double, quantidade: Int): Double {
-        val lucro =  valorDaAcao.minus(this.getCurrentWeightedAveragePrice()) * quantidade
-        return lucro.minus(getPrejuizoMaluco())
-
+        return kotlin.math.abs(valorTotal.minus(getDamage()))
     }
 
     fun valorTotalDaOperacaoDeduzidoOPreju(custoUnitárioDaAção: Double, quantidade: Int): Double {
         val valorTotal = custoUnitárioDaAção * quantidade
 
-        if (valorTotal <= getPrejuizoMaluco()) {
+        if (valorTotal <= getDamage()) {
             return 0.0
         }
 

@@ -24,7 +24,7 @@ class MainTest {
     fun valorDoPrejuizoDeVenda() {
         val expected = 30.0
         val main = Main()
-        val valorDoPrejuizoDeVenda = main.valorDoPrejuizoDeVenda(10.0, 3)
+        val valorDoPrejuizoDeVenda = main.sumDamageAboutSell(10.0, 3)
         assertEquals(expected, valorDoPrejuizoDeVenda)
     }
 
@@ -40,7 +40,7 @@ class MainTest {
     fun calcularLucro() {
         val expected = 90.0
         val main = Main()
-        val calcularLucro = main.calcularLucro(30.0, 3)
+        val calcularLucro = main.calculateProfit(30.0, 3)
         assertEquals(expected, calcularLucro)
     }
 
@@ -49,9 +49,9 @@ class MainTest {
         val expected = 15.0
         val main = Main()
         main.weightedAveragePrice(5, 2.00)
-        main.valorDoPrejuizoDeVenda(5.0, 3)
+        main.sumDamageAboutSell(5.0, 3)
         main.valorTotalDaOperacaoDeduzidoOPreju(10.0, 3)
-        assertEquals(expected, main.getPrejuizoMaluco())
+        assertEquals(expected, main.getDamage())
     }
 
     @Test
@@ -59,9 +59,9 @@ class MainTest {
         val expected = 20.0
         val main = Main()
         main.weightedAveragePrice(5, 20.0)
-        main.valorDoPrejuizoDeVenda(10.0, 2)
+        main.sumDamageAboutSell(10.0, 2)
         main.valorTotalDaOperacaoDeduzidoOPreju(20.0, 3)
-        assertEquals(expected, main.getPrejuizoMaluco())
+        assertEquals(expected, main.getDamage())
     }
 
     @Test
@@ -69,9 +69,9 @@ class MainTest {
         val expected = 30.0
         val main = Main()
         main.weightedAveragePrice(5, 20.0)
-        main.valorDoPrejuizoDeVenda(10.0, 3)
+        main.sumDamageAboutSell(10.0, 3)
         main.valorTotalDaOperacaoDeduzidoOPreju(10.0, 3)
-        assertEquals(expected, main.getPrejuizoMaluco())
+        assertEquals(expected, main.getDamage())
     }
 
     @Test
@@ -91,7 +91,7 @@ class MainTest {
         val juntar = main.juntarTodo(CorporateStock("sell", 5, 15.0))
 
         assertEquals(0.0, juntar.tax)
-        assertEquals(main.getPrejuizoMaluco(), expectedPrejuizo)
+        assertEquals(main.getDamage(), expectedPrejuizo)
     }
 
     @Test
@@ -110,10 +110,10 @@ class MainTest {
 
         main.juntarTodo(CorporateStock("buy", 10000, 10.0))
         main.juntarTodo(CorporateStock("sell", 5000, 2.0))
-        assertEquals(40000.0, main.getPrejuizoMaluco())
+        assertEquals(40000.0, main.getDamage())
 
         main.juntarTodo(CorporateStock("sell", 2000, 20.0))
-        assertEquals(20000.0, main.getPrejuizoMaluco())
+        assertEquals(20000.0, main.getDamage())
     }
 
 
