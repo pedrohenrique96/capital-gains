@@ -99,6 +99,7 @@ class Main {
             taxa.add(Taxa(0.0))
             return Taxa(0.0)
         } else if (acao.operation == "sell") {
+            subQuantidadeDeAcoes(acao.quantity)
             return if (precoMedioPonderado >= acao.unitCost) {
                 valorDoPrejuizoDeVenda(acao.unitCost, acao.quantity)
                 taxa.add(Taxa(0.0))
@@ -106,6 +107,8 @@ class Main {
             } else {
                 val valorTotal = valorTotalDaOperacaoDeduzidoOPreju(acao.unitCost, acao.quantity)
                 if (valorTotal <= 20000) {
+                    val deduzir = kotlin.math.abs((getPrecoMedioPonderado().minus(acao.unitCost) * acao.quantity))
+                    subPrejuizo(deduzir)
                     taxa.add(Taxa(0.0))
                     Taxa(0.0)
                 } else {
@@ -115,8 +118,6 @@ class Main {
                 }
             }
         }
-
-        taxa.add(Taxa(0.0))
         return Taxa(0.0)
     }
 
@@ -130,6 +131,10 @@ class Main {
 
     fun getQuantidadesDeacoesAtual(): Int {
         return quantidadesDeacoesAtual
+    }
+
+    fun subQuantidadeDeAcoes(quantidade: Int) {
+        quantidadesDeacoesAtual -= quantidade
     }
     fun weightedAveragePrice(quantidadeAcoesComprada: Int, valorDaCompra: Double): Double {
         return ((getQuantidadesDeacoesAtual() * getPrecoMedioPonderado()) + (quantidadeAcoesComprada * valorDaCompra)) /
@@ -149,9 +154,8 @@ class Main {
         return prejuizoMaluco
     }
 
-    private fun subPrejuizo(valor: Double): Double {
-        prejuizoMaluco -= valor
-        return prejuizoMaluco
+    private fun subPrejuizo(valor: Double) {
+        prejuizoMaluco = kotlin.math.abs(prejuizoMaluco.minus(valor))
     }
 
     fun calcularLucro(valorDaAcao: Double, quantidade: Int): Double {
@@ -163,14 +167,8 @@ class Main {
     fun valorTotalDaOperacaoDeduzidoOPreju(custoUnitárioDaAção: Double, quantidade: Int): Double {
         val valorTotal = custoUnitárioDaAção * quantidade
 
-
         if (valorTotal <= getPrejuizoMaluco()) {
-            val deduzir = getPrecoMedioPonderado().minus(custoUnitárioDaAção) * quantidade
-            subPrejuizo(deduzir)
             return 0.0
-        } else if (getPrejuizoMaluco() > 0) {
-            val deduzir = getPrecoMedioPonderado().minus(custoUnitárioDaAção) * quantidade
-            subPrejuizo(deduzir)
         }
 
         return calcularDiferencaPrejuizo(valorTotal)

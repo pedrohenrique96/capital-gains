@@ -66,7 +66,7 @@ class MainTest {
 
     @Test
     fun valorTotalDaOperacaoDeduzidoOPreju2() {
-        val expected = 0.0
+        val expected = 30.0
         val main = Main()
         main.weightedAveragePrice(5, 20.0)
         main.valorDoPrejuizoDeVenda(10.0, 3)
@@ -106,12 +106,11 @@ class MainTest {
 
     @Test
     fun testQuandoDaErroNoTipo6() {
-        val expected = 0.0
         val main = Main()
 
         main.juntarTodo(Acao("buy", 10000, 10.0))
         main.juntarTodo(Acao("sell", 5000, 2.0))
-//        assertEquals(40000.0, main.getPrejuizoMaluco())
+        assertEquals(40000.0, main.getPrejuizoMaluco())
 
         main.juntarTodo(Acao("sell", 2000, 20.0))
         assertEquals(20000.0, main.getPrejuizoMaluco())
@@ -216,7 +215,7 @@ class MainTest {
     @Test
     fun testarOInputDoJsonCaso7() {
         val expected = listOf<Taxa>(Taxa(0.0), Taxa(0.0), Taxa(0.0),
-                Taxa(0.0), Taxa(300.0), Taxa(0.0), Taxa(0.0), Taxa(3700.0), Taxa(0.0))
+                Taxa(0.0), Taxa(3000.0), Taxa(0.0), Taxa(0.0), Taxa(3700.0), Taxa(0.0))
 
         val json = """
            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
