@@ -7,23 +7,23 @@ import kotlin.test.assertEquals
 
 class CapitalGainTest {
     @Test
-    fun weightedAveragePrice() {
+    fun `Given input value then return weighted Average Price`() {
         val expected = 20.0
         val capitalGain = CapitalGain()
-        val weightedAveragePrice = capitalGain.weightedAveragePrice(5, 20.0)
-        assertEquals(expected, weightedAveragePrice)
+        val actual = capitalGain.weightedAveragePrice(5, 20.0)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun weightedAveragePrice2() {
+    fun `Given input value then return weighted Average Price different`() {
         val expected = 17.0
         val capitalGain = CapitalGain()
-        val weightedAveragePrice2 = capitalGain.weightedAveragePrice(5, 17.0)
-        assertEquals(expected, weightedAveragePrice2)
+        val actual = capitalGain.weightedAveragePrice(5, 17.0)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun valorDoPrejuizoDeVenda() {
+    fun `Given input value then return damage`() {
         val expected = 30.0
         val capitalGain = CapitalGain()
         capitalGain.sumDamageAboutSell(10.0, 3)
@@ -31,15 +31,15 @@ class CapitalGainTest {
     }
 
     @Test
-    fun calcularLucro() {
+    fun `Given input value then return calculate profit`() {
         val expected = 18.0
         val capitalGain = CapitalGain()
-        val calcularLucro = capitalGain.calculateProfit(30.0, 3)
-        assertEquals(expected, calcularLucro)
+        val actual = capitalGain.calculateProfit(30.0, 3)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun valorTotalDaOperacaoDeduzidoOPrejuMasDeveSerZeroPorqueTemMuitoPrejuizoParaPouco() {
+    fun `Given input value shouldn't return negative number`() {
         val expected = 15.0
         val capitalGain = CapitalGain()
         capitalGain.weightedAveragePrice(5, 2.00)
@@ -49,7 +49,7 @@ class CapitalGainTest {
     }
 
     @Test
-    fun valorTotalDaOperacaoDeduzidoOPrejut() {
+    fun `Given input value shouldn't return negative number, validation solution`() {
         val expected = 20.0
         val capitalGain = CapitalGain()
         capitalGain.weightedAveragePrice(5, 20.0)
@@ -59,7 +59,7 @@ class CapitalGainTest {
     }
 
     @Test
-    fun valorTotalDaOperacaoDeduzidoOPreju2() {
+    fun `Given input value shouldn't return negative number, validation solution two`() {
         val expected = 30.0
         val capitalGain = CapitalGain()
         capitalGain.weightedAveragePrice(5, 20.0)
@@ -69,37 +69,37 @@ class CapitalGainTest {
     }
 
     @Test
-    fun testJuntarTudoQuandoCompra() {
+    fun `Given a stock of buy th return tax and calculate weighted average price`() {
         val capitalGain = CapitalGain()
-        val juntar = capitalGain.invoke(Stock("buy", 5, 20.0))
+        val actual = capitalGain.invoke(Stock("buy", 5, 20.0)).tax
 
-        assertEquals(0.0, juntar.tax)
+        assertEquals(0.0, actual)
         assertEquals(20.0, capitalGain.getCurrentWeightedAveragePrice())
     }
 
     @Test
-    fun testJuntarTudoQuandoVenda() {
-        val expectedPrejuizo = 25.0
+    fun `Given a stock of sell with damage th tax and register damage`() {
+        val expected = 25.0
         val capitalGain = CapitalGain()
         capitalGain.invoke(Stock("buy", 5, 20.0))
-        val juntar = capitalGain.invoke(Stock("sell", 5, 15.0))
+        val actual = capitalGain.invoke(Stock("sell", 5, 15.0)).tax
 
-        assertEquals(0.0, juntar.tax)
-        assertEquals(capitalGain.getDamage(), expectedPrejuizo)
+        assertEquals(0.0, actual)
+        assertEquals(capitalGain.getDamage(), expected)
     }
 
     @Test
-    fun testJuntarTudoQuandoVenda2() {
+    fun `Given a stock of sell without damage th return tax`() {
         val expected = 8400.0
         val capitalGain = CapitalGain()
         capitalGain.invoke(Stock("buy", 200, 20.0))
-        val juntar = capitalGain.invoke(Stock("sell", 150, 300.0))
+        val actual = capitalGain.invoke(Stock("sell", 150, 300.0)).tax
 
-        assertEquals(expected, juntar.tax)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testQuandoDaErroNoTipo6() {
+    fun `When have a register damage a next sell should paid the damage before`() {
         val capitalGain = CapitalGain()
 
         capitalGain.invoke(Stock("buy", 10000, 10.0))
@@ -116,8 +116,8 @@ class CapitalGainTest {
         val capitalGain = CapitalGain()
         val stock = Stock("invalid", 10000, 10.0)
 
-        val result = capitalGain(stock)
+        val actual = capitalGain(stock).tax
 
-        assertEquals(expected, result.tax)
+        assertEquals(expected, actual)
     }
 }

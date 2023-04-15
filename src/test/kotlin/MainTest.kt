@@ -5,9 +5,8 @@ import kotlin.test.assertEquals
 
 class MainTest {
     @Test
-    fun testarOInputDoJsonCaso1() {
+    fun `Case one should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0))
-
 
         val json = """
             [{"operation":"buy", "unit-cost":10.00, "quantity": 100},
@@ -15,14 +14,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":15.00, "quantity": 50}]
             """.trimIndent()
 
+        val actual = taxes(json)
 
-        val test = taxes(json)
-
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso2() {
+    fun `Case two should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(10000.0), Tax(0.0))
 
         val json = """
@@ -31,13 +29,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":5.00, "quantity": 5000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso3() {
+    fun `Case tree should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(1000.0))
 
         val json = """
@@ -46,13 +44,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":20.00, "quantity": 3000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso4() {
+    fun `Case four should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0))
 
         val json = """
@@ -61,13 +59,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":15.00, "quantity": 10000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso5() {
+    fun `Case five should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0), Tax(10000.0))
 
         val json = """
@@ -77,13 +75,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":25.00, "quantity": 5000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso6() {
+    fun `Case six should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(0.0), Tax(0.0), Tax(0.0), Tax(3000.0))
 
         val json = """
@@ -94,13 +92,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":25.00, "quantity": 1000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso7() {
+    fun `Case seven should return taxes`() {
         val expected = listOf<Tax>(
             Tax(0.0), Tax(0.0), Tax(0.0),
             Tax(0.0), Tax(3000.0), Tax(0.0), Tax(0.0), Tax(3700.0), Tax(0.0)
@@ -118,13 +116,13 @@ class MainTest {
             {"operation":"sell", "unit-cost":30.00, "quantity": 650}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun testarOInputDoJsonCaso8() {
+    fun `Case eight should return taxes`() {
         val expected = listOf<Tax>(Tax(0.0), Tax(80000.0), Tax(0.0), Tax(60000.0))
 
         val json = """
@@ -134,9 +132,9 @@ class MainTest {
             {"operation":"sell", "unit-cost":50.00, "quantity": 10000}]
             """.trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-        assertEquals(expected, test)
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -157,9 +155,8 @@ class MainTest {
                 {"operation":"sell", "unit-cost":5.00, "quantity": 5000}
             ]""".trimIndent()
 
-        val test = taxes(json)
+        val actual = taxes(json)
 
-
-        assertEquals(expected1, test)
+        assertEquals(expected1, actual)
     }
 }
