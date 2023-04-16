@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.0"
+    id ("java")
     application
 }
 
@@ -13,6 +14,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
 }
 
 tasks.test {
@@ -25,4 +27,12 @@ kotlin {
 
 application {
     mainClass.set("MainKt")
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "MainKt"
+        )
+    }
 }

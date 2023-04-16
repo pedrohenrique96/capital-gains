@@ -1,38 +1,20 @@
-#ARG BUILD_HOME=/app
-#FROM gradle:jdk17 as build-image
-#ARG BUILD_HOME
-#ENV APP_HOME=$BUILD_HOME
-#WORKDIR $APP_HOME
-#COPY --chown=gradle:gradle build.gradle.kts settings.gradle.kts $APP_HOME/
-#COPY --chown=gradle:gradle src $APP_HOME/src
-#RUN gradle build
-#
-#FROM openjdk:17-alpine
-#ARG BUILD_HOME
-#ENV APP_HOME=$BUILD_HOME
-#COPY --from=build-image $APP_HOME/build/libs/account-0.0.1-SNAPSHOT.jar app.jar
-#EXPOSE 8080
-#ENTRYPOINT ["java", "-Dserver.port=8080", "-Dserver.address=0.0.0.0", "-jar", "app.jar"]
+# Use the Gradle image to build the project
+FROM gradle:jdk17 as build
 
-ARG BUILD_HOME=/app
-FROM gradle:openjdk:11-alphane as build-image
-ARG BUILD_HOME
-ENV APP_HOME=$BUILD_HOME
-WORKDIR $APP_HOME
-COPY --chown=gradle:gradle build.gradle.kts settings.gradle.kts $APP_HOME/
-COPY --chown=gradle:gradle src $APP_HOME/src
-RUN gradle build
+# Install Gradle and set the environment variables
+# I had to use the 7.4.2 version of Gradle to get the build to work
+ARG GRADLE_VERSION=7.4.2
+RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+    rm -rf /tmp/gradle-${GRADLE_VERSION}-bin.zip
+ENV GRADLE_HOME=/opt/gradle/gradle-${GRADLE_VERSION}
+ENV PATH=${GRADLE_HOME}/bin:${PATH}
 
-FROM openjdk:11
-ARG BUILD_HOME
-ENV APP_HOME=$BUILD_HOME
-COPY --from=build-image $APP_HOME/build/libs/tests-to-nu-1.0-SNAPSHOT.jar app.jar
+COPY --chown=gradle:gradle . /app
+WORKDIR /app
+RUN ./gradlew clean build --refresh-dependencies
 
-# Install readline library
-RUN apk add --no-cache readline
-
-# Set the entrypoint to launch the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
-
-# Set the command to execute the application
-CMD ["-interactive"]
+# Use the OpenJDK image to run the application
+FROM openjdk:17-alpine
+COPY --from=build /app/build/libs/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
