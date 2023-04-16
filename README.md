@@ -33,7 +33,7 @@ docker build -t app .
 #### Run the application
 
 ```bash
-docker run -i --rm app < input.txt or docker run -i --rm app // after input the data
+docker run -i --rm app < docs/input.txt or docker run -i --rm app // after input the data
 ```
 
 It is also possible to run the application using [IntelliJ IDEA](https://www.jetbrains.com/idea/).
