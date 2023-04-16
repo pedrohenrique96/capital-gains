@@ -3,8 +3,8 @@ import domain.Tax
 import utils.extension.roundTo
 
 const val TAX_PERCENTAGE = 0.20
-const val TAX_ZERO = 0.0
-const val MINIMUM_AMOUNT_TO_CHARGE_TAX = 20000.0
+const val TAX_ZERO = 0.00
+const val MINIMUM_AMOUNT_TO_CHARGE_TAX = 20000.00
 const val OPERATION_IS_NOT_VALID = -1.0
 
 class CapitalGain {

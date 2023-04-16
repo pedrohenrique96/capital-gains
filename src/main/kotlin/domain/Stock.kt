@@ -1,10 +1,10 @@
 package domain
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-data class Stock(val operation: String,
-                 val quantity: Int,
-                 @JsonNames("unit-cost")
-                 val unitCost: Double)
+data class Stock(
+     val operation: String,
+     val quantity: Int,
+     @JsonProperty("unit-cost")
+     val unitCost: Double
+)

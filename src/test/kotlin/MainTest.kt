@@ -144,16 +144,12 @@ class MainTest {
         val expected2 = listOf<Tax>(Tax(0.0), Tax(10000.0), Tax(0.0))
 
         val json = """
-            [
-                {"operation":"buy", "unit-cost":10.00, "quantity": 100},
-                {"operation":"sell", "unit-cost":15.00, "quantity": 50},
-                {"operation":"sell", "unit-cost":15.00, "quantity": 50}
-            ],
-            [
-                {"operation":"buy", "unit-cost":10.00, "quantity": 10000},
-                {"operation":"sell", "unit-cost":20.00, "quantity": 5000},
-                {"operation":"sell", "unit-cost":5.00, "quantity": 5000}
-            ]""".trimIndent()
+            [{"operation":"buy", "unit-cost":10.00, "quantity": 100},
+            {"operation":"sell", "unit-cost":15.00, "quantity": 50},
+            {"operation":"sell", "unit-cost":15.00, "quantity": 50}]
+            [{"operation":"buy", "unit-cost":10.00, "quantity": 10000},
+            {"operation":"sell", "unit-cost":20.00, "quantity": 5000},
+            {"operation":"sell", "unit-cost":5.00, "quantity": 5000}]""".trimIndent()
 
         val actual = taxes(json)
 
