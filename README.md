@@ -33,7 +33,13 @@ docker build -t app .
 #### Run the application
 
 ```bash
-docker run -i --rm app < docs/input.txt or docker run -i --rm app // after input the data
+docker run -i --rm app < docs/input.txt
+```
+
+or
+
+```bash
+docker run -i --rm app
 ```
 
 It is also possible to run the application using [IntelliJ IDEA](https://www.jetbrains.com/idea/).
@@ -50,3 +56,4 @@ We have some gradle tasks to run testing. The following command runs the applica
 
 * **Gradle**: Dependency manager
 * **Jackson**: JSON serialization/deserialization
+* **kotlin-stdlib**: Kotlin standard library
